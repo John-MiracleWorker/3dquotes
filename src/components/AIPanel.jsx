@@ -1,5 +1,5 @@
 import React from 'react'
-import { Brain, Clock, Settings, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Brain, Clock, Settings, AlertTriangle, CheckCircle, Thermometer, Zap } from 'lucide-react'
 
 const AIPanel = ({ analysis }) => {
   const getComplexityColor = (complexity) => {
@@ -16,6 +16,8 @@ const AIPanel = ({ analysis }) => {
       case 'PLA': return 'text-green-600'
       case 'ABS': return 'text-blue-600'
       case 'PETG': return 'text-purple-600'
+      case 'TPU': return 'text-orange-600'
+      case 'Resin': return 'text-pink-600'
       default: return 'text-gray-600'
     }
   }
@@ -89,15 +91,60 @@ const AIPanel = ({ analysis }) => {
             
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Print Speed:</span>
-              <span className="font-medium">60mm/s</span>
+              <span className="font-medium">{analysis.printSpeed}mm/s</span>
             </div>
             
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Temperature:</span>
-              <span className="font-medium">
-                {analysis.recommendedMaterial === 'PLA' ? '200°C' : 
-                 analysis.recommendedMaterial === 'ABS' ? '240°C' : '230°C'}
-              </span>
+              <div className="flex items-center space-x-1">
+                <Thermometer size={16} className="text-gray-400" />
+                <span className="font-medium">{analysis.temperature}°C</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600">Bed Temperature:</span>
+              <span className="font-medium">{analysis.bedTemperature}°C</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* AI Reasoning */}
+      <div className="mt-6 pt-6 border-t border-gray-200">
+        <h3 className="font-semibold text-gray-900 mb-4">AI Reasoning</h3>
+        <div className="space-y-4">
+          <div>
+            <h4 className="font-medium text-gray-900 mb-2">Material Choice</h4>
+            <p className="text-gray-700 text-sm">{analysis.materialReasoning}</p>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-gray-900 mb-2">Support Analysis</h4>
+            <p className="text-gray-700 text-sm">{analysis.supportReasoning}</p>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-gray-900 mb-2">Quality Recommendations</h4>
+            <p className="text-gray-700 text-sm">{analysis.qualityRecommendations}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Potential Issues & Post-Processing */}
+      <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-3">Potential Issues</h3>
+            <div className="bg-yellow-50 p-3 rounded-lg">
+              <p className="text-yellow-800 text-sm">{analysis.potentialIssues}</p>
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-3">Post-Processing</h3>
+            <div className="bg-blue-50 p-3 rounded-lg">
+              <p className="text-blue-800 text-sm">{analysis.postProcessing}</p>
             </div>
           </div>
         </div>

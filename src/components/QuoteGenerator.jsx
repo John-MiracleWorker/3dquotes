@@ -18,40 +18,31 @@ const QuoteGenerator = () => {
       setUploadedFile(file)
       setIsAnalyzing(true)
       
-      // Simulate AI analysis
-      setTimeout(() => {
-        const analysis = {
-          complexity: Math.random() > 0.5 ? 'High' : 'Medium',
-          estimatedPrintTime: Math.floor(Math.random() * 10) + 2,
-          recommendedMaterial: ['PLA', 'ABS', 'PETG'][Math.floor(Math.random() * 3)],
-          supportNeeded: Math.random() > 0.7,
-          layerHeight: Math.random() > 0.5 ? 0.2 : 0.1,
-          infillDensity: Math.floor(Math.random() * 40) + 20,
-          notes: [
-            'Model appears to have overhangs requiring support',
-            'Consider printing with 20% infill for strength',
-            'Recommended layer height: 0.2mm for good detail'
-          ]
-        }
-        setAiAnalysis(analysis)
-        setIsAnalyzing(false)
+      try {
+        // Create form data for file upload
+        const formData = new FormData()
+        formData.append('model', file)
+        formData.append('specialRequests', specialRequests)
         
-        // Calculate pricing
-        const basePrice = 15
-        const complexityMultiplier = analysis.complexity === 'High' ? 1.5 : 1.2
-        const materialCost = { PLA: 5, ABS: 8, PETG: 6 }[analysis.recommendedMaterial]
-        const supportCost = analysis.supportNeeded ? 10 : 0
-        const totalPrice = (basePrice + materialCost + supportCost) * complexityMultiplier
-        
-        setPricing({
-          basePrice,
-          materialCost,
-          supportCost,
-          complexityMultiplier,
-          totalPrice: Math.round(totalPrice * 100) / 100,
-          estimatedDelivery: analysis.estimatedPrintTime + 2
+        // Call the AI analysis API
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          body: formData
         })
-      }, 2000)
+        
+        if (!response.ok) {
+          throw new Error('Analysis failed')
+        }
+        
+        const result = await response.json()
+        setAiAnalysis(result.analysis)
+        setPricing(result.pricing)
+        setIsAnalyzing(false)
+      } catch (error) {
+        console.error('Analysis error:', error)
+        setIsAnalyzing(false)
+        alert('Failed to analyze model. Please try again.')
+      }
     }
   }
 
